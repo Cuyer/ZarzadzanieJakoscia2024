@@ -59,12 +59,14 @@ public class AccountManager {
             throw new IllegalArgumentException("User should not be null");
         }
         Account account = dao.findAccountById(accountId);
-        if (account == null) {
-            throw new IllegalArgumentException("Account does not exist");
-        }
+
 
         Operation operation = new Withdraw(user, amount, description, account);
         boolean success = auth.canInvokeOperation(operation, user);
+        if (account == null) {
+            history.logUnauthorizedOperation(operation, success);
+            throw new OperationIsNotAllowedException("Unauthorized operation");
+        }
         if (!success) {
             history.logUnauthorizedOperation(operation, success);
             throw new OperationIsNotAllowedException("Unauthorized operation");

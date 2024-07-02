@@ -69,6 +69,26 @@ public class AuthenticationManagerTest {
     }
 
     @Test
+    void testLogOut_NullUser() throws SQLException {
+        doNothing().when(history).logLogOut(null);
+
+        boolean result = authManager.logOut(null);
+
+        assertFalse(result);
+        verify(history, times(1)).logLogOut(null);
+    }
+
+    @Test
+    void testLogOut_ValidUser() throws SQLException {
+        doNothing().when(history).logLogOut(user);
+
+        boolean result = authManager.logOut(user);
+
+        assertTrue(result);
+        verify(history, times(1)).logLogOut(user);
+    }
+
+    @Test
     void testLogIn_BadPassword() throws SQLException {
         when(dao.findUserByName("TestUser")).thenReturn(user);
         when(dao.findPasswordForUser(user)).thenReturn(password);

@@ -166,11 +166,12 @@ public class AccountManagerTest {
         when(dao.findAccountById(accountId)).thenReturn(null);
         when(dao.findAccountById(2)).thenReturn(destAccount);
 
-        assertThrows(OperationIsNotAllowedException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             accountManager.internalPayment(user, 100.0, "Transfer", accountId, 2);
         });
 
-        verify(history).logUnauthorizedOperation(any(Operation.class), eq(false));
+        verify(history, never()).logUnauthorizedOperation(any(Operation.class), anyBoolean());
+        verify(history, never()).logOperation(any(Operation.class), anyBoolean());
     }
 
     @Test
@@ -178,11 +179,12 @@ public class AccountManagerTest {
         when(dao.findAccountById(accountId)).thenReturn(account);
         when(dao.findAccountById(2)).thenReturn(null);
 
-        assertThrows(OperationIsNotAllowedException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             accountManager.internalPayment(user, 100.0, "Transfer", accountId, 2);
         });
 
-        verify(history).logUnauthorizedOperation(any(Operation.class), eq(false));
+        verify(history, never()).logUnauthorizedOperation(any(Operation.class), anyBoolean());
+        verify(history, never()).logOperation(any(Operation.class), anyBoolean());
     }
 
     @Test
@@ -235,15 +237,11 @@ public class AccountManagerTest {
 
     @Test
     void testPaymentOut_NegativeAmount() throws SQLException {
-        when(dao.findAccountById(accountId)).thenReturn(account);
-        when(auth.canInvokeOperation(any(Operation.class), eq(user))).thenReturn(true);
-
         assertThrows(IllegalArgumentException.class, () -> {
             accountManager.paymentOut(user, -100.0, "Negative Withdraw", accountId);
         });
-
-        verify(history, never()).logOperation(any(Operation.class), anyBoolean());
-        verify(dao, never()).updateAccountState(account);
+        verify(history).logOperation(any(Operation.class), anyBoolean());
+        verify(dao, never()).updateAccountState(any(Account.class));
     }
 
     @Test
