@@ -30,11 +30,14 @@ public class AuthenticationManager {
         this.history=bankHistory;
     }
 
+    /*
+    Zły komunikat. Jest Bad Password, ale nie dochodzimy nawet do sprawdzania hasła, bo nie znaleźliśmy użytkownika po nazwie
+     */
     public User logIn(String userName, char[] password) throws UserUnnkownOrBadPasswordException, SQLException {
         User user = dao.findUserByName(userName);
         if (user==null) {
             history.logLoginFailure(null,"Zła nazwa użytkownika "+userName);
-            throw new UserUnnkownOrBadPasswordException("Bad Password");
+            throw new UserUnnkownOrBadPasswordException("Bad Username");
         }
         Password paswd = dao.findPasswordForUser(user);
         if (checkPassword(paswd,password)) {
@@ -47,9 +50,17 @@ public class AuthenticationManager {
         }
     }
 
+    /*
+    Brak sprawdzenia, czy user nie jest nullem
+     */
     public boolean logOut(User user) throws SQLException {
-        history.logLogOut(user);
-        return true;
+        if (user == null) {
+            history.logLogOut(user);
+            return false;
+        } else {
+            history.logLogOut(user);
+            return true;
+        }
     }
 
     private boolean checkPassword(Password passwd, char[] password) {

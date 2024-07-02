@@ -13,6 +13,10 @@ public class Account {
         return true;
     }
 
+    /*
+    Brak sprawdzenia, czy ammount jest > 0
+     */
+
     public boolean outcome(double ammount){
         if (this.ammount<ammount) return false;
         this.ammount-=ammount;

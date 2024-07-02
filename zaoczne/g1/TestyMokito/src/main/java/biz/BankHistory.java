@@ -29,9 +29,12 @@ public class BankHistory {
         logOperation(o,false);
     }
 
+    /*
+    Jeśli user == null to powinniśy mieć false, w przeciwnym wypadku true
+     */
     public void logLogOut(User user) throws SQLException {
         Operation o = new LogOut(user,"Logowanie ");
-        logOperation(o,true);
+        logOperation(o,user != null);
     }
 
     public void logPaymentIn(Account account, double ammount, boolean success) {
